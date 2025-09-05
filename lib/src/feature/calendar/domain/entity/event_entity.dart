@@ -1,10 +1,9 @@
-import 'package:flutter/scheduler.dart';
-
 class EventEntity {
   final int? id;
   final DateTime date;
   final String title;
   final String? subtitle;
+  final String? note;
   final Priority priority;
   final String? startTime;
   final String? endTime;
@@ -14,8 +13,11 @@ class EventEntity {
     required this.date,
     required this.title,
     this.subtitle,
+    this.note,
     required this.priority,
     this.startTime,
     this.endTime,
   });
 }
+
+enum Priority { low, normal, high }
