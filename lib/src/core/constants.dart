@@ -41,3 +41,5 @@ DateTime monthFromIndex(int idx) {
 }
 
 int indexFromMonth(DateTime dt) => (dt.year - kMinYear) * 12 + (dt.month - 1);
+
+enum Priority { low, normal, high }
