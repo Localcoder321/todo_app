@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:todo_app/src/feature/calendar/data/datasource/events_local_datasource.dart';
 import 'package:todo_app/src/feature/calendar/data/models/event_model.dart';
 import 'package:todo_app/src/feature/calendar/domain/entity/event_entity.dart';
@@ -17,6 +19,7 @@ class EventRepositoryImpl implements EventRepository {
       title: e.title,
       subtitle: e.subtitle,
       note: e.note,
+      location: e.location,
       priority: e.priority,
       startTime: e.startTime,
       endTime: e.endTime,
@@ -32,6 +35,7 @@ class EventRepositoryImpl implements EventRepository {
       title: e.title,
       subtitle: e.subtitle,
       note: e.note,
+      location: e.location,
       priority: e.priority,
       startTime: e.startTime,
       endTime: e.endTime,
@@ -41,6 +45,7 @@ class EventRepositoryImpl implements EventRepository {
 
   @override
   Future<void> deleteEvent(int id) async {
+    log("${local.delete(id)}");
     await local.delete(id);
   }
 
@@ -55,6 +60,7 @@ class EventRepositoryImpl implements EventRepository {
             title: m.title,
             subtitle: m.subtitle,
             note: m.note,
+            location: m.location,
             priority: m.priority,
             startTime: m.startTime,
             endTime: m.endTime,
@@ -64,12 +70,15 @@ class EventRepositoryImpl implements EventRepository {
   }
 
   @override
-  Future<Map<String, int>> eventCountsForMonth(int year, int month) async =>
-      await local.eventCountsForMonth(year, month);
+  Future<Map<String, int>> eventCountsForMonth(int year, int month) async {
+    log("${local.eventCountsForMonth(year, month)}");
+    return await local.eventCountsForMonth(year, month);
+  }
 
   @override
   Future<List<EventEntity>> eventsInRange(DateTime from, DateTime to) async {
     final models = await local.eventsInRange(from, to);
+    log("$models");
     return models
         .map(
           (m) => EventEntity(
@@ -78,6 +87,7 @@ class EventRepositoryImpl implements EventRepository {
             title: m.title,
             subtitle: m.subtitle,
             note: m.note,
+            location: m.location,
             priority: m.priority,
             startTime: m.startTime,
             endTime: m.endTime,

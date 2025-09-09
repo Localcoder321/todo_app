@@ -1,7 +1,7 @@
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
-import 'package:todo_app/src/core/constants.dart';
+import 'package:todo_app/src/core/constants/constants.dart';
 import 'package:todo_app/src/feature/calendar/data/models/event_model.dart';
 
 class EventsLocalDatasource {
@@ -24,6 +24,7 @@ class EventsLocalDatasource {
             title TEXT NOT NULL,
             subtitle TEXT,
             note TEXT,
+            location TEXT,
             priority INTEGER NOT NULL,
             start_time TEXT,
             end_time TEXT

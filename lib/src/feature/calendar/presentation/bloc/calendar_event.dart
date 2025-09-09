@@ -9,9 +9,14 @@ abstract class CalendarEvent extends Equatable {
 
 class LoadMonth extends CalendarEvent {
   final int monthIndex;
-
   const LoadMonth(this.monthIndex);
-
   @override
   List<Object?> get props => [monthIndex];
+}
+
+class LoadDayEvents extends CalendarEvent {
+  final DateTime date;
+  const LoadDayEvents(this.date);
+  @override
+  List<Object?> get props => [date];
 }
