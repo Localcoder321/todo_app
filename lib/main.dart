@@ -19,7 +19,7 @@ void main() async {
 
   final repository = EventRepositoryImpl(local);
 
-  final getCounts = GetEventCountsForMonthUsecase(repository);
+  final getCounts = GetEventsForMonthUsecase(repository);
   final getEventsForDay = GetEventsForDayUsecase(repository);
   final addEvent = AddEventUsecase(repository);
   final updateEvent = UpdateEventUsecase(repository);
@@ -37,7 +37,7 @@ void main() async {
 }
 
 class MyApp extends StatelessWidget {
-  final GetEventCountsForMonthUsecase getEventCountsForMonth;
+  final GetEventsForMonthUsecase getEventCountsForMonth;
   final GetEventsForDayUsecase getEventsForDay;
   final AddEventUsecase addEvent;
   final UpdateEventUsecase updateEvent;
@@ -58,8 +58,8 @@ class MyApp extends StatelessWidget {
       providers: [
         BlocProvider(
           create: (_) => CalendarBloc(
-            getCounts: getEventCountsForMonth,
             getEventsForDay: getEventsForDay,
+            getEventsForMonth: getEventCountsForMonth,
           ),
         ),
         BlocProvider(

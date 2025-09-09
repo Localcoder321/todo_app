@@ -9,24 +9,26 @@ part 'calendar_event.dart';
 part 'calendar_state.dart';
 
 class CalendarBloc extends Bloc<CalendarEvent, CalendarState> {
-  final GetEventCountsForMonthUsecase getCounts;
+  final GetEventsForMonthUsecase getEventsForMonth;
   final GetEventsForDayUsecase getEventsForDay;
 
-  CalendarBloc({
-    required this.getCounts,
-    required this.getEventsForDay,
-  }) : super(CalendarInitial()) {
+  CalendarBloc({required this.getEventsForMonth, required this.getEventsForDay})
+    : super(CalendarInitial()) {
+    /// Load all events for the given month
     on<LoadMonth>((e, emit) async {
       emit(MonthLoading(e.monthIndex));
       try {
         final month = monthFromIndex(e.monthIndex);
-        final counts = await getCounts.call(month.year, month.month);
-        emit(MonthLoaded(monthIndex: e.monthIndex, month: month, counts: counts));
+        final events = await getEventsForMonth.call(month.year, month.month);
+        emit(
+          MonthLoaded(monthIndex: e.monthIndex, month: month, events: events),
+        );
       } catch (err) {
         emit(CalendarError(err.toString()));
       }
     });
 
+    /// Load events for a specific day
     on<LoadDayEvents>((e, emit) async {
       emit(DayEventsLoading(e.date));
       try {

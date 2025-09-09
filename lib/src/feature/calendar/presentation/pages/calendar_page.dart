@@ -30,29 +30,19 @@ class _CalendarPageState extends State<CalendarPage> {
   @override
   void initState() {
     super.initState();
-
-    // initial page index centered on current month
     _currentIndex = indexFromMonth(DateTime.now());
     _pageController = PageController(initialPage: _currentIndex);
 
-    // safe to call bloc after first frame
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final bloc = context.read<CalendarBloc>();
       bloc.add(LoadMonth(_currentIndex));
       bloc.add(LoadDayEvents(_selectedDate));
 
-      // Subscribe to EventEditBloc stream so we react to create/update/delete actions
-      // This lets CalendarPage refresh itself whenever event operations complete,
-      // without needing the UI pages to return a value.
       try {
         final editBloc = context.read<EventEditBloc>();
         _eventEditSub = editBloc.stream.listen((state) {
-          // Heuristic: when an edit bloc state appears (any state),
-          // trigger a reload of the current month & day.
-          // We avoid aggressive reloads by ignoring rapidly repeating 'loading' state names.
           final name = state.runtimeType.toString().toLowerCase();
           if (!name.contains('loading')) {
-            // Slight delay to allow DB transaction to complete if needed
             Future.delayed(const Duration(milliseconds: 120), () {
               if (mounted) {
                 context.read<CalendarBloc>().add(LoadMonth(_currentIndex));
@@ -62,7 +52,6 @@ class _CalendarPageState extends State<CalendarPage> {
           }
         });
       } catch (e) {
-        // If EventEditBloc is not provided for some reason, we just skip subscription.
         log('EventEditBloc subscription skipped: $e');
       }
     });
@@ -75,9 +64,7 @@ class _CalendarPageState extends State<CalendarPage> {
     super.dispose();
   }
 
-  /// Called by child widgets (EventCard / ScheduleList) when events changed.
   void _onChildChanged() {
-    // reload current month and day when something changed
     context.read<CalendarBloc>().add(LoadMonth(_currentIndex));
     context.read<CalendarBloc>().add(LoadDayEvents(_selectedDate));
   }
@@ -91,31 +78,11 @@ class _CalendarPageState extends State<CalendarPage> {
       appBar: AppBar(
         backgroundColor: AppColors.white,
         title: Text(
-          "${monthNames[monthDate.month - 1]} ${monthDate.year}",
+          "${_selectedDate.day} ${monthNames[monthDate.month - 1]} ${monthDate.year}",
           style: TextStyle(color: AppColors.black, fontSize: 20),
         ),
         centerTitle: true,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.chevron_left, color: AppColors.black),
-          onPressed: () {
-            _pageController.previousPage(
-              duration: const Duration(milliseconds: 300),
-              curve: Curves.easeInOut,
-            );
-          },
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.chevron_right, color: AppColors.black),
-            onPressed: () {
-              _pageController.nextPage(
-                duration: const Duration(milliseconds: 300),
-                curve: Curves.easeInOut,
-              );
-            },
-          ),
-        ],
       ),
       body: BlocListener<CalendarBloc, CalendarState>(
         listener: (context, state) {
@@ -124,22 +91,42 @@ class _CalendarPageState extends State<CalendarPage> {
               setState(() => _dayEvents = List.from(state.events));
             }
           }
-          if (state is MonthLoaded) {
-            final m = state.month;
-            if (_selectedDate.year != m.year ||
-                _selectedDate.month != m.month) {
-              setState(() => _selectedDate = DateTime(m.year, m.month, 1));
-              context.read<CalendarBloc>().add(LoadDayEvents(_selectedDate));
-            }
-          }
-          if (state is CalendarError) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Calendar error: ${state.message}')),
-            );
-          }
         },
         child: Column(
           children: [
+            // header with month + arrows
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8),
+              child: Row(
+                children: [
+                  Text(
+                    monthNames[monthDate.month - 1],
+                    style: TextStyle(color: AppColors.black, fontSize: 20),
+                  ),
+                  const Spacer(),
+                  IconButton(
+                    icon: const Icon(Icons.chevron_left, color: AppColors.black),
+                    onPressed: () {
+                      _pageController.previousPage(
+                        duration: const Duration(milliseconds: 300),
+                        curve: Curves.easeInOut,
+                      );
+                    },
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.chevron_right, color: AppColors.black),
+                    onPressed: () {
+                      _pageController.nextPage(
+                        duration: const Duration(milliseconds: 300),
+                        curve: Curves.easeInOut,
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ),
+
+            // weekdays row
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               child: Row(
@@ -161,7 +148,8 @@ class _CalendarPageState extends State<CalendarPage> {
                     .toList(),
               ),
             ),
-            // Calendar pager (lazy-loaded)
+
+            // month pages
             Expanded(
               child: BlocBuilder<CalendarBloc, CalendarState>(
                 builder: (context, state) {
@@ -175,44 +163,36 @@ class _CalendarPageState extends State<CalendarPage> {
                     itemBuilder: (context, idx) {
                       final month = monthFromIndex(idx);
 
-                      // If we have MonthLoaded for this index — show with counts
                       if (state is MonthLoaded && state.monthIndex == idx) {
-                        final Map<int, int> dayCounts = {};
-                        state.counts.forEach((k, v) {
-                          try {
-                            final d = parseYmd(k);
-                            if (d.year == month.year &&
-                                d.month == month.month) {
-                              dayCounts[d.day] = v;
-                            }
-                          } catch (e) {
-                            log("Error parsing date from counts: $e");
+                        final Map<int, List<Priority>> dayPriorities = {};
+
+                        for (final e in state.events) {
+                          if (e.date.year == month.year &&
+                              e.date.month == month.month) {
+                            dayPriorities.putIfAbsent(e.date.day, () => []);
+                            dayPriorities[e.date.day]!.add(e.priority);
                           }
-                        });
+                        }
 
                         return Padding(
                           padding: const EdgeInsets.only(top: 8),
                           child: MonthView(
                             month: state.month,
-                            counts: dayCounts,
+                            dayEvents: dayPriorities,
                             selectedDate: _selectedDate,
                             onDaySelected: (d) {
                               setState(() => _selectedDate = d);
-                              context.read<CalendarBloc>().add(
-                                LoadDayEvents(d),
-                              );
+                              context.read<CalendarBloc>().add(LoadDayEvents(d));
                             },
                           ),
                         );
                       }
 
-                      // IMPORTANT: Fallback - show empty MonthView while DB loads.
-                      // This prevents an eternal full-screen spinner while the bloc fetches counts.
                       return Padding(
                         padding: const EdgeInsets.only(top: 8),
                         child: MonthView(
                           month: month,
-                          counts: const {},
+                          dayEvents: const {},
                           selectedDate: _selectedDate,
                           onDaySelected: (d) {
                             setState(() => _selectedDate = d);
@@ -226,35 +206,24 @@ class _CalendarPageState extends State<CalendarPage> {
               ),
             ),
 
-            // Schedule / Add area (Figma style)
+            // bottom schedule
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(16),
               decoration: const BoxDecoration(
                 color: AppColors.white,
                 borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.white,
-                    blurRadius: 8,
-                    offset: Offset(0, -2),
-                  ),
-                ],
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // date + add
+                  // title + add btn
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        "Schedule",
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18,
-                        ),
-                      ),
+                      const Text("Schedule",
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 18)),
                       ElevatedButton.icon(
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.blue,
@@ -262,17 +231,10 @@ class _CalendarPageState extends State<CalendarPage> {
                             borderRadius: BorderRadius.circular(12),
                           ),
                         ),
-                        icon: const Icon(
-                          Icons.add,
-                          size: 18,
-                          color: AppColors.white,
-                        ),
-                        label: const Text(
-                          "Add",
-                          style: TextStyle(color: AppColors.white),
-                        ),
+                        icon: const Icon(Icons.add, size: 18, color: AppColors.white),
+                        label: const Text("Add",
+                            style: TextStyle(color: AppColors.white)),
                         onPressed: () async {
-                          // open Add screen with selected date prefilled
                           final changed = await Navigator.push<bool>(
                             context,
                             MaterialPageRoute(
@@ -280,28 +242,12 @@ class _CalendarPageState extends State<CalendarPage> {
                                   AddEditEventPage(initialDate: _selectedDate),
                             ),
                           );
-
-                          // If the page returned true -> child created/updated something
-                          // otherwise we also schedule a safe reload to ensure consistency.
-                          if (changed == true) {
-                            _onChildChanged();
-                          } else {
-                            // make sure to re-query current month/day (safe)
-                            context.read<CalendarBloc>().add(
-                              LoadMonth(_currentIndex),
-                            );
-                            context.read<CalendarBloc>().add(
-                              LoadDayEvents(_selectedDate),
-                            );
-                          }
+                          if (changed == true) _onChildChanged();
                         },
                       ),
                     ],
                   ),
-
                   const SizedBox(height: 12),
-
-                  // Schedule list: pass callback so EventCard can notify changes
                   ScheduleList(events: _dayEvents, onChanged: _onChildChanged),
                 ],
               ),

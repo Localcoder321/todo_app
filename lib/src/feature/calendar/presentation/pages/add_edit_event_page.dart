@@ -150,7 +150,6 @@ class _AddEditEventPageState extends State<AddEditEventPage> {
             key: _formKey,
             child: Column(
               children: [
-                // Header
                 Align(
                   alignment: AlignmentGeometry.centerLeft,
                   child: GestureDetector(
@@ -159,8 +158,6 @@ class _AddEditEventPageState extends State<AddEditEventPage> {
                   ),
                 ),
                 const SizedBox(height: 20),
-
-                // Event name
                 CustomInputField(
                   title: "Event name",
                   controller: _titleController,
@@ -168,16 +165,12 @@ class _AddEditEventPageState extends State<AddEditEventPage> {
                   required: true,
                 ),
                 const SizedBox(height: 12),
-
-                // Subtitle
                 CustomInputField(
                   title: "Subtitle",
                   controller: _subtitleController,
                   placeholder: 'Subtitle',
                 ),
                 const SizedBox(height: 12),
-
-                // Event description
                 CustomInputField(
                   title: "Event description",
                   maxLines: 3,
@@ -185,8 +178,6 @@ class _AddEditEventPageState extends State<AddEditEventPage> {
                   placeholder: 'Event description',
                 ),
                 const SizedBox(height: 12),
-
-                // Event location
                 CustomInputField(
                   title: "Event location",
                   controller: _locationController,
@@ -194,8 +185,6 @@ class _AddEditEventPageState extends State<AddEditEventPage> {
                   suffixIcon: const Icon(Icons.location_on, color: Colors.blue),
                 ),
                 const SizedBox(height: 12),
-
-                // Priority
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -245,7 +234,6 @@ class _AddEditEventPageState extends State<AddEditEventPage> {
                   ],
                 ),
                 const SizedBox(height: 12),
-                //Start, End styled like input fields
                 CustomPickerField(
                   title: "Start time",
                   label: 'Start',
@@ -263,7 +251,6 @@ class _AddEditEventPageState extends State<AddEditEventPage> {
                 ),
                 Spacer(flex: 1),
 
-                // Add button
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(

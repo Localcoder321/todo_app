@@ -24,7 +24,7 @@ class ScheduleList extends StatelessWidget {
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       itemBuilder: (context, i) => EventCard(event: events[i], onChanged: onChanged),
-      separatorBuilder: (_, __) => const SizedBox(height: 8),
+      separatorBuilder: (_, _) => const SizedBox(height: 8),
       itemCount: events.length,
     );
   }

@@ -6,46 +6,58 @@ abstract class CalendarState extends Equatable {
   List<Object?> get props => [];
 }
 
+/// Initial state
 class CalendarInitial extends CalendarState {}
 
+/// Month is loading
 class MonthLoading extends CalendarState {
   final int monthIndex;
   const MonthLoading(this.monthIndex);
+
   @override
   List<Object?> get props => [monthIndex];
 }
 
+/// Month loaded with events
 class MonthLoaded extends CalendarState {
   final int monthIndex;
   final DateTime month;
-  final Map<String, int> counts;
+  final List<EventEntity> events;
+
   const MonthLoaded({
     required this.monthIndex,
     required this.month,
-    required this.counts,
+    required this.events,
   });
+
   @override
-  List<Object?> get props => [monthIndex, month, counts];
+  List<Object?> get props => [monthIndex, month, events];
 }
 
+/// Day events loading
 class DayEventsLoading extends CalendarState {
   final DateTime date;
   const DayEventsLoading(this.date);
+
   @override
   List<Object?> get props => [date];
 }
 
+/// Day events loaded
 class DayEventsLoaded extends CalendarState {
   final DateTime date;
   final List<EventEntity> events;
   const DayEventsLoaded({required this.date, required this.events});
+
   @override
   List<Object?> get props => [date, events];
 }
 
+/// Error state
 class CalendarError extends CalendarState {
   final String message;
   const CalendarError(this.message);
+
   @override
   List<Object?> get props => [message];
 }

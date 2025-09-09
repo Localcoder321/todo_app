@@ -32,7 +32,6 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // 🔵 HEADER CARD
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(16),
@@ -48,7 +47,6 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Top bar
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -90,7 +88,6 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                     ],
                   ),
                   const SizedBox(height: 12),
-                  // Title
                   Text(
                     _event.title,
                     style: const TextStyle(
@@ -108,7 +105,6 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                       ),
                     ),
                   const SizedBox(height: 12),
-                  // Time + Location
                   Row(
                     children: [
                       const Icon(
@@ -152,10 +148,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
               ),
             ),
           ),
-
           const SizedBox(height: 24),
-
-          // 🕑 Reminder
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Column(
@@ -173,10 +166,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
               ],
             ),
           ),
-
           const SizedBox(height: 24),
-
-          // 📖 Description (NOTE field)
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Column(
@@ -196,9 +186,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
               ],
             ),
           ),
-
           const Spacer(),
-          // 🗑️ Delete button
           Padding(
             padding: const EdgeInsets.only(
               left: 16,

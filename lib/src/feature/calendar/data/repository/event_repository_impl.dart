@@ -70,15 +70,36 @@ class EventRepositoryImpl implements EventRepository {
   }
 
   @override
-  Future<Map<String, int>> eventCountsForMonth(int year, int month) async {
-    log("${local.eventCountsForMonth(year, month)}");
-    return await local.eventCountsForMonth(year, month);
-  }
-
-  @override
   Future<List<EventEntity>> eventsInRange(DateTime from, DateTime to) async {
     final models = await local.eventsInRange(from, to);
     log("$models");
+    return models
+        .map(
+          (m) => EventEntity(
+            id: m.id,
+            date: m.date,
+            title: m.title,
+            subtitle: m.subtitle,
+            note: m.note,
+            location: m.location,
+            priority: m.priority,
+            startTime: m.startTime,
+            endTime: m.endTime,
+          ),
+        )
+        .toList();
+  }
+
+  @override
+  Future<List<EventEntity>> getEventsForMonth(int year, int month) async {
+    // start of month
+    final from = DateTime(year, month, 1);
+
+    // end of month (last day)
+    final to = DateTime(year, month + 1, 0);
+
+    final models = await local.eventsInRange(from, to);
+
     return models
         .map(
           (m) => EventEntity(
