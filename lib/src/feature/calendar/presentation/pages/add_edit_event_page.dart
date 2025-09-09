@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:todo_app/src/core/constants/app_colors.dart';
+import 'package:todo_app/src/core/constants/constants.dart';
 import 'package:todo_app/src/feature/calendar/domain/entity/event_entity.dart';
 import 'package:todo_app/src/feature/calendar/presentation/bloc/event_edit_bloc.dart';
 import 'package:todo_app/src/feature/calendar/presentation/widgets/custom_input_field.dart';
@@ -36,7 +37,7 @@ class _AddEditEventPageState extends State<AddEditEventPage> {
     _titleController = TextEditingController(text: ev?.title ?? '');
     _subtitleController = TextEditingController(text: ev?.subtitle ?? '');
     _noteController = TextEditingController(text: ev?.note ?? '');
-    _locationController = TextEditingController();
+    _locationController = TextEditingController(text: ev?.location ?? '');
 
     _date = ev?.date ?? widget.initialDate ?? DateTime.now();
     _startTime = ev != null
@@ -118,8 +119,8 @@ class _AddEditEventPageState extends State<AddEditEventPage> {
             ? null
             : _locationController.text.trim(),
         priority: _priority,
-        startTime: _startTime.toIso8601String(),
-        endTime: _endTime.toIso8601String(),
+        startTime: formatYmd(_startTime),
+        endTime: formatYmd(_endTime),
       );
 
       final bloc = context.read<EventEditBloc>();
@@ -129,7 +130,7 @@ class _AddEditEventPageState extends State<AddEditEventPage> {
         bloc.add(ModifyEvent(newEvent));
       }
 
-      Navigator.pop(context);
+      Navigator.pop(context, true);
     }
   }
 
@@ -161,6 +162,7 @@ class _AddEditEventPageState extends State<AddEditEventPage> {
 
                 // Event name
                 CustomInputField(
+                  title: "Event name",
                   controller: _titleController,
                   placeholder: 'Event name',
                   required: true,
@@ -169,6 +171,7 @@ class _AddEditEventPageState extends State<AddEditEventPage> {
 
                 // Subtitle
                 CustomInputField(
+                  title: "Subtitle",
                   controller: _subtitleController,
                   placeholder: 'Subtitle',
                 ),
@@ -176,6 +179,7 @@ class _AddEditEventPageState extends State<AddEditEventPage> {
 
                 // Event description
                 CustomInputField(
+                  title: "Event description",
                   maxLines: 3,
                   controller: _noteController,
                   placeholder: 'Event description',
@@ -184,6 +188,7 @@ class _AddEditEventPageState extends State<AddEditEventPage> {
 
                 // Event location
                 CustomInputField(
+                  title: "Event location",
                   controller: _locationController,
                   placeholder: 'Event location',
                   suffixIcon: const Icon(Icons.location_on, color: Colors.blue),
@@ -191,57 +196,66 @@ class _AddEditEventPageState extends State<AddEditEventPage> {
                 const SizedBox(height: 12),
 
                 // Priority
-                Container(
-                  decoration: BoxDecoration(
-                    color: Colors.grey[200],
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
-                  child: DropdownButtonFormField<Priority>(
-                    initialValue: _priority,
-                    decoration: const InputDecoration(border: InputBorder.none),
-                    items: Priority.values
-                        .map(
-                          (p) => DropdownMenuItem(
-                            value: p,
-                            child: Row(
-                              children: [
-                                Container(
-                                  width: 20,
-                                  height: 20,
-                                  margin: const EdgeInsets.only(right: 8),
-                                  decoration: BoxDecoration(
-                                    color: p == Priority.high
-                                        ? Colors.red
-                                        : p == Priority.normal
-                                        ? Colors.orange
-                                        : Colors.green,
-                                    borderRadius: BorderRadius.circular(4),
-                                  ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text("Priority", style: TextStyle(color: AppColors.black)),
+                    const SizedBox(height: 4),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.grey[200],
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      child: DropdownButtonFormField<Priority>(
+                        initialValue: _priority,
+                        decoration: const InputDecoration(
+                          border: InputBorder.none,
+                        ),
+                        items: Priority.values
+                            .map(
+                              (p) => DropdownMenuItem(
+                                value: p,
+                                child: Row(
+                                  children: [
+                                    Container(
+                                      width: 20,
+                                      height: 20,
+                                      margin: const EdgeInsets.only(right: 8),
+                                      decoration: BoxDecoration(
+                                        color: p == Priority.high
+                                            ? Colors.red
+                                            : p == Priority.normal
+                                            ? Colors.orange
+                                            : Colors.green,
+                                        borderRadius: BorderRadius.circular(4),
+                                      ),
+                                    ),
+                                    Text(p.name),
+                                  ],
                                 ),
-                                Text(p.name),
-                              ],
-                            ),
-                          ),
-                        )
-                        .toList(),
-                    onChanged: (p) {
-                      if (p != null) setState(() => _priority = p);
-                    },
-                  ),
+                              ),
+                            )
+                            .toList(),
+                        onChanged: (p) {
+                          if (p != null) setState(() => _priority = p);
+                        },
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 12),
-
                 //Start, End styled like input fields
                 CustomPickerField(
+                  title: "Start time",
                   label: 'Start',
                   value: _timeLabel(_startTime),
                   onTap: _pickStartTime,
                   icon: Icons.access_time,
                 ),
                 const SizedBox(height: 12),
-
                 CustomPickerField(
+                  title: "End time",
                   label: 'End',
                   value: _timeLabel(_endTime),
                   onTap: _pickEndTime,

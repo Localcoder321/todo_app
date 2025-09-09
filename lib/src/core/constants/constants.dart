@@ -17,13 +17,13 @@ const List<String> monthNames = [
 ];
 
 const List<String> weekDaysShort = [
+  "Sun",
   "Mon",
   "Tue",
   "Wed",
   "Thu",
   "Fri",
   "Sat",
-  "Sun",
 ];
 
 String formatYmd(DateTime d) =>

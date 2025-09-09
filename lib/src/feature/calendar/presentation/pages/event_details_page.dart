@@ -5,14 +5,27 @@ import 'package:todo_app/src/feature/calendar/domain/entity/event_entity.dart';
 import 'package:todo_app/src/feature/calendar/presentation/bloc/event_edit_bloc.dart';
 import 'package:todo_app/src/feature/calendar/presentation/pages/add_edit_event_page.dart';
 
-class EventDetailsPage extends StatelessWidget {
+class EventDetailsPage extends StatefulWidget {
   final EventEntity event;
   const EventDetailsPage({super.key, required this.event});
 
   @override
+  State<EventDetailsPage> createState() => _EventDetailsPageState();
+}
+
+class _EventDetailsPageState extends State<EventDetailsPage> {
+  late EventEntity _event;
+
+  @override
+  void initState() {
+    super.initState();
+    _event = widget.event;
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final start = DateTime.tryParse(event.startTime ?? '');
-    final end = DateTime.tryParse(event.endTime ?? '');
+    final start = DateTime.tryParse(_event.startTime ?? '');
+    final end = DateTime.tryParse(_event.endTime ?? '');
 
     return Scaffold(
       backgroundColor: AppColors.white,
@@ -54,18 +67,24 @@ class EventDetailsPage extends StatelessWidget {
                           elevation: 0,
                           backgroundColor: AppColors.transparent,
                         ),
-                        label: Text(
+                        label: const Text(
                           "Edit",
                           style: TextStyle(color: AppColors.white),
                         ),
                         icon: const Icon(Icons.edit, color: AppColors.white),
                         onPressed: () async {
-                          await Navigator.push(
+                          final shouldRefresh = await Navigator.push<bool>(
                             context,
                             MaterialPageRoute(
-                              builder: (_) => AddEditEventPage(event: event),
+                              builder: (_) => AddEditEventPage(event: _event),
                             ),
                           );
+
+                          if (shouldRefresh == true) {
+                            context.read<EventEditBloc>().add(
+                              ModifyEvent(_event),
+                            );
+                          }
                         },
                       ),
                     ],
@@ -73,16 +92,16 @@ class EventDetailsPage extends StatelessWidget {
                   const SizedBox(height: 12),
                   // Title
                   Text(
-                    event.title,
+                    _event.title,
                     style: const TextStyle(
                       color: AppColors.white,
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  if (event.subtitle != null && event.subtitle!.isNotEmpty)
+                  if (_event.subtitle != null && _event.subtitle!.isNotEmpty)
                     Text(
-                      event.subtitle!,
+                      _event.subtitle!,
                       style: const TextStyle(
                         color: AppColors.white,
                         fontSize: 14,
@@ -111,7 +130,7 @@ class EventDetailsPage extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 8),
-                  if (event.location != null && event.location!.isNotEmpty)
+                  if (_event.location != null && _event.location!.isNotEmpty)
                     Row(
                       children: [
                         const Icon(
@@ -121,7 +140,7 @@ class EventDetailsPage extends StatelessWidget {
                         ),
                         const SizedBox(width: 8),
                         Text(
-                          event.subtitle!,
+                          _event.location!,
                           style: const TextStyle(
                             color: AppColors.white,
                             fontSize: 14,
@@ -169,8 +188,8 @@ class EventDetailsPage extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  event.note?.isNotEmpty == true
-                      ? event.note!
+                  _event.note?.isNotEmpty == true
+                      ? _event.note!
                       : "No description provided.",
                   style: const TextStyle(color: AppColors.grey),
                 ),
@@ -197,12 +216,12 @@ class EventDetailsPage extends StatelessWidget {
                 ),
               ),
               onPressed: () {
-                context.read<EventEditBloc>().add(RemoveEvent(event.id!));
-                Navigator.pop(context);
+                context.read<EventEditBloc>().add(RemoveEvent(_event.id!));
+                Navigator.pop(context, true);
               },
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                child: const Row(
+              child: const Padding(
+                padding: EdgeInsets.symmetric(vertical: 16),
+                child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Icon(Icons.delete, color: AppColors.red),

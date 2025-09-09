@@ -38,7 +38,7 @@ class MonthView extends StatelessWidget {
             margin: const EdgeInsets.all(4),
             decoration: BoxDecoration(
               color: isSelected ? AppColors.blue : AppColors.transparent,
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(50),
             ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,

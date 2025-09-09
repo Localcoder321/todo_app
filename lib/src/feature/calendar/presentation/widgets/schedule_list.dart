@@ -5,24 +5,25 @@ import 'package:todo_app/src/feature/calendar/presentation/widgets/event_card.da
 
 class ScheduleList extends StatelessWidget {
   final List<EventEntity> events;
+  final VoidCallback? onChanged;
 
-  const ScheduleList({super.key, required this.events});
+  const ScheduleList({super.key, required this.events, this.onChanged});
 
   @override
   Widget build(BuildContext context) {
     if (events.isEmpty) {
       return Padding(
-        padding: EdgeInsets.all(12),
+        padding: const EdgeInsets.all(12),
         child: Text(
           "No events scheduled",
-          style: TextStyle(color: AppColors.grey),
+          style: TextStyle(color: AppColors.grey, fontSize: 14),
         ),
       );
     }
     return ListView.separated(
       shrinkWrap: true,
-      physics: NeverScrollableScrollPhysics(),
-      itemBuilder: (context, i) => EventCard(event: events[i]),
+      physics: const NeverScrollableScrollPhysics(),
+      itemBuilder: (context, i) => EventCard(event: events[i], onChanged: onChanged),
       separatorBuilder: (_, __) => const SizedBox(height: 8),
       itemCount: events.length,
     );
