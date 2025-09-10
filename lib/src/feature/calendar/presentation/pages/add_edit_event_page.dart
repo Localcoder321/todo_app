@@ -119,8 +119,8 @@ class _AddEditEventPageState extends State<AddEditEventPage> {
             ? null
             : _locationController.text.trim(),
         priority: _priority,
-        startTime: formatYmd(_startTime),
-        endTime: formatYmd(_endTime),
+        startTime: formatYmdHm(_startTime),
+        endTime: formatYmdHm(_endTime),
       );
 
       final bloc = context.read<EventEditBloc>();
@@ -213,10 +213,10 @@ class _AddEditEventPageState extends State<AddEditEventPage> {
                                       margin: const EdgeInsets.only(right: 8),
                                       decoration: BoxDecoration(
                                         color: p == Priority.high
-                                            ? Colors.red
+                                            ? AppColors.saturatedRed
                                             : p == Priority.normal
-                                            ? Colors.orange
-                                            : Colors.green,
+                                            ? AppColors.saturatedOrange
+                                            : AppColors.saturatedBlue,
                                         borderRadius: BorderRadius.circular(4),
                                       ),
                                     ),

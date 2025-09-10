@@ -17,5 +17,5 @@ class AppColors {
   static const Color paleBlue = Color(0xFFEFF6FF);
   static const Color saturatedBlue = Color(0xFF1976D2);
   static const Color darkBlue = Color(0xFF0D47A1);
-  static const Color pealGrey = Color(0xFFEAEAEA);
+  static const Color paleGrey = Color(0xFFEAEAEA);
 }

@@ -96,7 +96,10 @@ class _CalendarPageState extends State<CalendarPage> {
           children: [
             // header with month + arrows
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 24.0,
+                vertical: 8,
+              ),
               child: Row(
                 children: [
                   Text(
@@ -105,7 +108,10 @@ class _CalendarPageState extends State<CalendarPage> {
                   ),
                   const Spacer(),
                   IconButton(
-                    icon: const Icon(Icons.chevron_left, color: AppColors.black),
+                    icon: const Icon(
+                      Icons.chevron_left,
+                      color: AppColors.black,
+                    ),
                     onPressed: () {
                       _pageController.previousPage(
                         duration: const Duration(milliseconds: 300),
@@ -114,7 +120,10 @@ class _CalendarPageState extends State<CalendarPage> {
                     },
                   ),
                   IconButton(
-                    icon: const Icon(Icons.chevron_right, color: AppColors.black),
+                    icon: const Icon(
+                      Icons.chevron_right,
+                      color: AppColors.black,
+                    ),
                     onPressed: () {
                       _pageController.nextPage(
                         duration: const Duration(milliseconds: 300),
@@ -182,7 +191,9 @@ class _CalendarPageState extends State<CalendarPage> {
                             selectedDate: _selectedDate,
                             onDaySelected: (d) {
                               setState(() => _selectedDate = d);
-                              context.read<CalendarBloc>().add(LoadDayEvents(d));
+                              context.read<CalendarBloc>().add(
+                                LoadDayEvents(d),
+                              );
                             },
                           ),
                         );
@@ -213,6 +224,14 @@ class _CalendarPageState extends State<CalendarPage> {
               decoration: const BoxDecoration(
                 color: AppColors.white,
                 borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.lightGrey,
+                    spreadRadius: 5,
+                    blurRadius: 7,
+                    offset: Offset(0, 3),
+                  ),
+                ],
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -221,9 +240,13 @@ class _CalendarPageState extends State<CalendarPage> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text("Schedule",
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 18)),
+                      const Text(
+                        "Schedule",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                        ),
+                      ),
                       ElevatedButton.icon(
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.blue,
@@ -231,9 +254,15 @@ class _CalendarPageState extends State<CalendarPage> {
                             borderRadius: BorderRadius.circular(12),
                           ),
                         ),
-                        icon: const Icon(Icons.add, size: 18, color: AppColors.white),
-                        label: const Text("Add",
-                            style: TextStyle(color: AppColors.white)),
+                        icon: const Icon(
+                          Icons.add,
+                          size: 18,
+                          color: AppColors.white,
+                        ),
+                        label: const Text(
+                          "Add",
+                          style: TextStyle(color: AppColors.white),
+                        ),
                         onPressed: () async {
                           final changed = await Navigator.push<bool>(
                             context,
