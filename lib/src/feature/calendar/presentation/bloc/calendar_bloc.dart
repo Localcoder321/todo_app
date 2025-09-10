@@ -14,7 +14,6 @@ class CalendarBloc extends Bloc<CalendarEvent, CalendarState> {
 
   CalendarBloc({required this.getEventsForMonth, required this.getEventsForDay})
     : super(CalendarInitial()) {
-    /// Load all events for the given month
     on<LoadMonth>((e, emit) async {
       emit(MonthLoading(e.monthIndex));
       try {
@@ -28,7 +27,6 @@ class CalendarBloc extends Bloc<CalendarEvent, CalendarState> {
       }
     });
 
-    /// Load events for a specific day
     on<LoadDayEvents>((e, emit) async {
       emit(DayEventsLoading(e.date));
       try {

@@ -22,7 +22,6 @@ class ScheduleList extends StatelessWidget {
     }
     return ListView.separated(
       shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
       itemBuilder: (context, i) => EventCard(event: events[i], onChanged: onChanged),
       separatorBuilder: (_, _) => const SizedBox(height: 8),
       itemCount: events.length,

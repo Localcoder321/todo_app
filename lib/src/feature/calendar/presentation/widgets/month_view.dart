@@ -5,7 +5,6 @@ import 'package:todo_app/src/feature/calendar/domain/entity/event_entity.dart';
 
 class MonthView extends StatelessWidget {
   final DateTime month;
-  /// day -> list of priorities
   final Map<int, List<Priority>> dayEvents;
   final DateTime selectedDate;
   final Function(DateTime) onDaySelected;
@@ -22,7 +21,8 @@ class MonthView extends StatelessWidget {
   Widget build(BuildContext context) {
     final firstDayOfMonth = DateTime(month.year, month.month, 1);
     final daysInMonth = DateTime(month.year, month.month + 1, 0).day;
-    final firstWeekday = firstDayOfMonth.weekday == 7 ? 0 : firstDayOfMonth.weekday;
+    final firstWeekday =
+        firstDayOfMonth.weekday == 7 ? 0 : firstDayOfMonth.weekday;
 
     List<Widget> dayWidgets = [];
     for (int i = 0; i < firstWeekday; i++) {
@@ -33,6 +33,10 @@ class MonthView extends StatelessWidget {
       final current = DateTime(month.year, month.month, day);
       final isSelected = isSameDay(selectedDate, current);
       final priorities = dayEvents[day] ?? [];
+
+      final firstRow = priorities.take(3).toList();
+      final secondRow = priorities.skip(3).take(3).toList();
+      final extraCount = priorities.length - 6;
 
       dayWidgets.add(
         GestureDetector(
@@ -55,23 +59,59 @@ class MonthView extends StatelessWidget {
                   ),
                 ),
 
-                // Dots for events
                 if (priorities.isNotEmpty)
                   Padding(
                     padding: const EdgeInsets.only(top: 4),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: priorities.take(3).map((priority) {
-                        return Container(
-                          margin: const EdgeInsets.symmetric(horizontal: 1),
-                          width: 6,
-                          height: 6,
-                          decoration: BoxDecoration(
-                            color: _priorityColor(priority),
-                            shape: BoxShape.circle,
+                    child: Column(
+                      children: [
+                        // first row
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: firstRow.map((priority) {
+                            return Container(
+                              margin:
+                                  const EdgeInsets.symmetric(horizontal: 1),
+                              width: 6,
+                              height: 6,
+                              decoration: BoxDecoration(
+                                color: _priorityColor(priority),
+                                shape: BoxShape.circle,
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                        // second row
+                        if (secondRow.isNotEmpty || extraCount > 0)
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              ...secondRow.map((priority) {
+                                return Container(
+                                  margin: const EdgeInsets.symmetric(
+                                      horizontal: 1, vertical: 1),
+                                  width: 6,
+                                  height: 6,
+                                  decoration: BoxDecoration(
+                                    color: _priorityColor(priority),
+                                    shape: BoxShape.circle,
+                                  ),
+                                );
+                              }),
+                              if (extraCount > 0)
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 2),
+                                  child: Text(
+                                    "+$extraCount",
+                                    style: const TextStyle(
+                                      fontSize: 8,
+                                      color: AppColors.black,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                            ],
                           ),
-                        );
-                      }).toList(),
+                      ],
                     ),
                   ),
               ],

@@ -90,6 +90,7 @@ class _CalendarPageState extends State<CalendarPage> {
             if (isSameDay(state.date, _selectedDate)) {
               setState(() => _dayEvents = List.from(state.events));
             }
+            context.read<CalendarBloc>().add(LoadMonth(_currentIndex));
           }
         },
         child: Column(
@@ -277,7 +278,13 @@ class _CalendarPageState extends State<CalendarPage> {
                     ],
                   ),
                   const SizedBox(height: 12),
-                  ScheduleList(events: _dayEvents, onChanged: _onChildChanged),
+                  SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.3,
+                    child: ScheduleList(
+                      events: _dayEvents,
+                      onChanged: _onChildChanged,
+                    ),
+                  ),
                 ],
               ),
             ),

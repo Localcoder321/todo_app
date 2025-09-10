@@ -92,12 +92,8 @@ class EventRepositoryImpl implements EventRepository {
 
   @override
   Future<List<EventEntity>> getEventsForMonth(int year, int month) async {
-    // start of month
     final from = DateTime(year, month, 1);
-
-    // end of month (last day)
     final to = DateTime(year, month + 1, 0);
-
     final models = await local.eventsInRange(from, to);
 
     return models
