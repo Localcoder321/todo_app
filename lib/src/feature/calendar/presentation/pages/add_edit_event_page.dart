@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:todo_app/src/core/constants/app_colors.dart';
 import 'package:todo_app/src/core/constants/constants.dart';
 import 'package:todo_app/src/feature/calendar/domain/entity/event_entity.dart';
@@ -130,7 +131,7 @@ class _AddEditEventPageState extends State<AddEditEventPage> {
         bloc.add(ModifyEvent(newEvent));
       }
 
-      Navigator.pop(context, true);
+      context.pop(true);
     }
   }
 

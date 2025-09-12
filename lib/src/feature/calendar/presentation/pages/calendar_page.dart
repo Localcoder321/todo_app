@@ -3,12 +3,13 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:todo_app/src/core/constants/app_colors.dart';
 import 'package:todo_app/src/core/constants/constants.dart';
+import 'package:todo_app/src/core/routers/app_router.dart';
 import 'package:todo_app/src/feature/calendar/domain/entity/event_entity.dart';
 import 'package:todo_app/src/feature/calendar/presentation/bloc/calendar_bloc.dart';
 import 'package:todo_app/src/feature/calendar/presentation/bloc/event_edit_bloc.dart';
-import 'package:todo_app/src/feature/calendar/presentation/pages/add_edit_event_page.dart';
 import 'package:todo_app/src/feature/calendar/presentation/widgets/month_view.dart';
 import 'package:todo_app/src/feature/calendar/presentation/widgets/schedule_list.dart';
 
@@ -83,6 +84,14 @@ class _CalendarPageState extends State<CalendarPage> {
         ),
         centerTitle: true,
         elevation: 0,
+        actions: [
+          IconButton(
+            icon: Icon(Icons.notifications, color: AppColors.black),
+            onPressed: () {
+              context.push(RouteNames.notFoundPage);
+            },
+          ),
+        ],
       ),
       body: BlocListener<CalendarBloc, CalendarState>(
         listener: (context, state) {
@@ -95,7 +104,6 @@ class _CalendarPageState extends State<CalendarPage> {
         },
         child: Column(
           children: [
-            // header with month + arrows
             Padding(
               padding: const EdgeInsets.symmetric(
                 horizontal: 24.0,
@@ -109,6 +117,9 @@ class _CalendarPageState extends State<CalendarPage> {
                   ),
                   const Spacer(),
                   IconButton(
+                    style: IconButton.styleFrom(
+                      backgroundColor: AppColors.paleGrey,
+                    ),
                     icon: const Icon(
                       Icons.chevron_left,
                       color: AppColors.black,
@@ -121,6 +132,9 @@ class _CalendarPageState extends State<CalendarPage> {
                     },
                   ),
                   IconButton(
+                    style: IconButton.styleFrom(
+                      backgroundColor: AppColors.paleGrey,
+                    ),
                     icon: const Icon(
                       Icons.chevron_right,
                       color: AppColors.black,
@@ -135,8 +149,6 @@ class _CalendarPageState extends State<CalendarPage> {
                 ],
               ),
             ),
-
-            // weekdays row
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               child: Row(
@@ -158,8 +170,6 @@ class _CalendarPageState extends State<CalendarPage> {
                     .toList(),
               ),
             ),
-
-            // month pages
             Expanded(
               child: BlocBuilder<CalendarBloc, CalendarState>(
                 builder: (context, state) {
@@ -217,8 +227,6 @@ class _CalendarPageState extends State<CalendarPage> {
                 },
               ),
             ),
-
-            // bottom schedule
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(16),
@@ -237,7 +245,6 @@ class _CalendarPageState extends State<CalendarPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // title + add btn
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -265,12 +272,9 @@ class _CalendarPageState extends State<CalendarPage> {
                           style: TextStyle(color: AppColors.white),
                         ),
                         onPressed: () async {
-                          final changed = await Navigator.push<bool>(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) =>
-                                  AddEditEventPage(initialDate: _selectedDate),
-                            ),
+                          final changed = await context.push<bool>(
+                            RouteNames.addEventPage,
+                            extra: _selectedDate,
                           );
                           if (changed == true) _onChildChanged();
                         },

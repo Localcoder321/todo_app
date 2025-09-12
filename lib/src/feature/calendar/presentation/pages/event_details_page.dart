@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:todo_app/src/core/constants/app_colors.dart';
+import 'package:todo_app/src/core/routers/app_router.dart';
 import 'package:todo_app/src/feature/calendar/domain/entity/event_entity.dart';
 import 'package:todo_app/src/feature/calendar/presentation/bloc/event_edit_bloc.dart';
-import 'package:todo_app/src/feature/calendar/presentation/pages/add_edit_event_page.dart';
 
 class EventDetailsPage extends StatefulWidget {
   final EventEntity event;
@@ -71,13 +72,10 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                         ),
                         icon: const Icon(Icons.edit, color: AppColors.white),
                         onPressed: () async {
-                          final shouldRefresh = await Navigator.push<bool>(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => AddEditEventPage(event: _event),
-                            ),
+                          final shouldRefresh = await context.push<bool>(
+                            RouteNames.addEventPage,
+                            extra: _event,
                           );
-
                           if (shouldRefresh == true) {
                             context.read<EventEditBloc>().add(
                               ModifyEvent(_event),
@@ -205,7 +203,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
               ),
               onPressed: () {
                 context.read<EventEditBloc>().add(RemoveEvent(_event.id!));
-                Navigator.pop(context, true);
+                context.pop(true);
               },
               child: const Padding(
                 padding: EdgeInsets.symmetric(vertical: 16),
